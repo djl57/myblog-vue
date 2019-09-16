@@ -1,24 +1,42 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import Vue from "vue";
+import Router from "vue-router";
 
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: '',
-      component: () => import('@/views/home.vue')
+      path: "/",
+      name: "",
+      component: () => import("@/views/home.vue")
     },
     {
-      path: '/svg',
-      name: 'svg',
-      component: () => import('@/views/svg.vue')
+      path: "/manageBlog",
+      name: "manageBlog",
+      component: () => import("@/views/manageBlog.vue"),
+      redirect: "/manageBlog/atricle",
+      children: [
+        {
+          path: "atricle",
+          name: "atricle",
+          component: () => import("@/views/atricle.vue")
+        },
+        {
+          path: "tag",
+          name: "tag",
+          component: () => import("@/views/tag.vue")
+        },
+        {
+          path: "catagory",
+          name: "catagory",
+          component: () => import("@/views/catagory.vue")
+        }
+      ]
     },
     {
-      path: '/map01',
-      name: 'map01',
-      component: () => import('@/views/map01.vue')
-    }
+      path: "/addAtricle",
+      name: "addAtricle",
+      component: () => import("@/views/addAtricle.vue")
+    },
   ]
-})
+});

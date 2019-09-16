@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <svg-icon icon-class='left' class="svg"></svg-icon>
-  </div>
+  <div>article</div>
 </template>
 
 <script>
