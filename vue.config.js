@@ -6,8 +6,18 @@ module.exports = {
   productionSourceMap: false,
   devServer: {
     port: 5050,
-    host: "localhost"
+    host: "localhost",
     // open: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          "^/api": ""
+        }
+      }
+    }
   },
   // svg配置
   chainWebpack: config => {

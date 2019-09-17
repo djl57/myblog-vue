@@ -9,23 +9,17 @@
             <i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>我的简历</el-dropdown-item>
-            <el-dropdown-item command="forgetPass" divided>忘记密码</el-dropdown-item>
-            <el-dropdown-item command="gotoHome">返回首页</el-dropdown-item>
+            <el-dropdown-item command="myIntro">我的简历</el-dropdown-item>
+            <el-dropdown-item command="gotoHome" divided>返回首页</el-dropdown-item>
+            <el-dropdown-item command="signOut">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </el-header>
       <el-container>
         <el-aside width="200px">
           <el-menu :default-active="activeIndex" @select="handleSelect">
-            <el-menu-item index="1">
-              <span slot="title">文章管理</span>
-            </el-menu-item>
-            <el-menu-item index="2">
-              <span slot="title">标签管理</span>
-            </el-menu-item>
-            <el-menu-item index="3">
-              <span slot="title">分类管理</span>
+            <el-menu-item v-for="side in sides" :key="side.name" :index="side.name">
+              <span slot="title">{{side.meta.title}}</span>
             </el-menu-item>
           </el-menu>
         </el-aside>
@@ -41,7 +35,7 @@
 export default {
   data() {
     return {
-      activeIndex: "1",
+      activeIndex: this.$route.name,
       dialogVisible: false,
       ruleForm: {
         pass: ""
@@ -50,24 +44,37 @@ export default {
         pass: [{ required: true, message: "请输入密码", trigger: "change" }]
       },
       url: require("../assets/logo.png"),
-      fit: "contain"
+      fit: "contain",
+      sides: []
     };
+  },
+  created() {
+    const routes = this.$router.options.routes;
+    const sides = routes.filter(route => route.path === "/manageBlog");
+    if (sides && sides.length === 1) {
+      this.sides = sides[0].children.filter(side => side.meta.isSide);
+    }
   },
   methods: {
     handleSelect(key, keyPath) {
-      console.log(key, keyPath);
+      this.$router.push({ name: key });
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
     handleCommand(command) {
-      if (command === "gotoHome") {
+      if (command === "myIntro") {
         this.$router.push({
-          path: "/"
+          name: "myIntro"
         });
-      } else if (command === "forgetPass") {
+        return;
+      }
+      if (command === "signOut") {
         localStorage.removeItem("passSave");
       }
+      this.$router.push({
+        path: "/"
+      });
     }
   }
 };
