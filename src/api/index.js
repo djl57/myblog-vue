@@ -9,3 +9,8 @@ export const AddCatagory = data => axios.postData("addCatagory", data);
 export const GetCatagorys = data => axios.getData("getCatagorys", data);
 export const DelCatagory = data => axios.deleteData("delCatagory", data);
 export const PutCatagory = data => axios.putData("putCatagory", data);
+
+export const AddArticle = data => axios.postData("addArticle", data);
+export const GetArticles = data => axios.getData("getArticles", data);
+export const DelArticle = data => axios.deleteData("delArticle", data);
+export const PutArticle = data => axios.putData("putArticle", data);

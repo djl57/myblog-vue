@@ -1,0 +1,23 @@
+.html-table {
+  table {
+    border-collapse: collapse;
+  }
+  table tr th,
+  table tr td {
+    font-size: 14px;
+    color: #4f4f4f;
+    line-height: 22px;
+    border: 1px solid #ddd;
+    padding: 8px;
+    word-break: normal !important;
+    vertical-align: middle;
+  }
+  table tr th {
+    font-weight: 700;
+    background-color: #eff3f5;
+  }
+  img {
+    width: 50%;
+    height: auto;
+  }
+}

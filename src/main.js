@@ -7,8 +7,11 @@ import "element-ui/lib/theme-chalk/index.css";
 import "normalize.css/normalize.css";
 import "@/styles/index.scss";
 import "@/icons";
+import mavonEditor from "mavon-editor";
+import "mavon-editor/dist/css/index.css";
 
 Vue.use(ElementUI, { size: "medium" });
+Vue.use(mavonEditor)
 
 Vue.config.productionTip = false;
 
