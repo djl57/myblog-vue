@@ -3,45 +3,26 @@
     <el-container>
       <el-header>
         <el-image :src="url" :fit="fit"></el-image>
-        <el-link :underline="false" href="#" target="_blank" class="link">分类1</el-link>
-        <el-link :underline="false" href="#" target="_blank" class="link">分类2</el-link>
-        <el-link :underline="false" href="#" target="_blank" class="link">分类3</el-link>
-        <el-link :underline="false" href="#" target="_blank" class="link">分类4</el-link>
+        <el-link
+          v-for="item in catagory"
+          :key="item.id"
+          :underline="false"
+          :class="curCatagoryId === item.id?'catagory-active':'link'"
+          @click="clickCatagory(item.id)"
+        >{{item.name}}</el-link>
         <el-link :underline="false" target="_blank" @click="gotoManagePage" class="link">管理博客</el-link>
       </el-header>
       <el-container>
         <el-aside width="200px">
-          <el-menu :default-active="activeIndex" @select="handleSelect">
-            <el-menu-item index="1">
-              <span slot="title">标签1</span>
-            </el-menu-item>
-            <el-menu-item index="2">
-              <span slot="title">标签1</span>
-            </el-menu-item>
-            <el-menu-item index="3">
-              <span slot="title">标签1</span>
-            </el-menu-item>
-            <el-menu-item index="4">
-              <span slot="title">标签1</span>
-            </el-menu-item>
-          </el-menu>
+          <span>头像+介绍</span>
         </el-aside>
-        <el-main>
-          <li class="article">
-            <p class="float-left">博文标题博文标题</p>
-            <p class="float-right">2019.09.09</p>
-          </li>
-          <li class="article">
-            <p class="float-left">博文标题博文标题</p>
-            <p class="float-right">2019.09.09</p>
-          </li>
-          <li class="article">
-            <p class="float-left">博文标题博文标题</p>
-            <p class="float-right">2019.09.09</p>
-          </li>
-          <li class="article">
-            <p class="float-left">博文标题博文标题</p>
-            <p class="float-right">2019.09.09</p>
+        <el-main v-loading="articleLoading">
+          <li class="article" v-for="item in articles" :key="item.id" @click="clickArticle(item)">
+            <p class="title">{{item.title}}</p>
+            <p class="tag">
+              <el-tag v-for="(t, index) in item.tagName" :key="t" :type="getType(index)">{{t}}</el-tag>
+            </p>
+            <p class="date">{{item.createTime}}</p>
           </li>
         </el-main>
       </el-container>
@@ -68,6 +49,7 @@
 </template>
 
 <script>
+import { GetCatagorys, GetArticles } from "../api";
 export default {
   data() {
     return {
@@ -81,17 +63,47 @@ export default {
       },
       url: require("../assets/logo.png"),
       fit: "contain",
-      checked: true
+      checked: true,
+      catagory: [],
+      curCatagoryId: 1,
+      articleLoading: true,
+      articles: []
     };
   },
+  created() {
+    this.getCatagory();
+  },
   methods: {
+    getCatagory() {
+      GetCatagorys().then(({ code, data }) => {
+        if (code === "200") {
+          this.catagory = data;
+          this.curCatagoryId = data[0].id;
+          this.getArticles();
+        }
+      });
+    },
+    getArticles() {
+      this.articleLoading = true;
+      GetArticles({ catagory: this.curCatagoryId }).then(res => {
+        console.log(res);
+        if (res.code === "200") {
+          this.articles = res.data;
+          this.articleLoading = false;
+        }
+      });
+    },
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
+    },
+    getType(index) {
+      const colorList = ["success", "info", "warning", "danger"];
+      return colorList[index];
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          console.log(this.ruleForm.pass);
+          // console.log(this.ruleForm.pass);
           if (this.ruleForm.pass === "1234567") {
             if (this.checked) {
               localStorage.setItem("passSave", 1);
@@ -123,6 +135,13 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
+    },
+    clickCatagory(id) {
+      this.curCatagoryId = id;
+      this.getArticles();
+    },
+    clickArticle(article) {
+      console.log(article);
     }
   }
 };
@@ -141,10 +160,15 @@ export default {
     float: right;
   }
 }
+.catagory-active {
+  padding: 0 20px;
+  color: #409eff;
+}
 .el-aside {
   background-color: #fff;
   color: #000;
   text-align: center;
+  border-right: 1px solid #dcdfe6;
 }
 .el-main {
   background-color: #fff;
@@ -176,14 +200,24 @@ export default {
   margin: 0 50px 0 30px;
   height: 60px;
 }
-.float-left {
-  float: left;
-  width: 60%;
+.title {
+  flex: 0 1 50%;
 }
-.float-right {
-  float: right;
+// .date,
+// .tag {
+//   width: 25%;
+// }
+.date {
+  color: #909399;
+  font-size: 14px;
 }
 .article {
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #dcdfe6;
+  &:first-child {
+    border-top: 1px solid #dcdfe6;
+  }
 }
 </style>

@@ -57,7 +57,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="publicVisible = false">取 消</el-button>
         <el-button type="primary" @click="submitForm('ruleForm')">发布文章</el-button>
       </span>
     </el-dialog>
@@ -89,18 +89,18 @@ export default {
       addCatagoryVisible: false,
       addCatagoryName: "",
       publics: [
-        { status: 0, label: "公开" },
-        { status: 1, label: "私密" },
-        { status: 2, label: "保存为草稿" }
+        { status: "0", label: "公开" },
+        { status: "1", label: "私密" },
+        { status: "2", label: "保存为草稿" }
       ],
       ruleForm: {
         tag: [],
         catagory: [],
-        publicStatus: ""
+        publicStatus: "0"
       },
       rules: {
         publicStatus: [
-          { required: true, message: "请输入活动名称", trigger: "blur" }
+          { required: true, message: "请选择发布形式", trigger: "blur" }
         ]
       }
     };
@@ -110,8 +110,6 @@ export default {
       this.$router.push({ path: "/manageBlog" });
     },
     publicArticle() {
-      console.log(this.render);
-
       if (!this.title) {
         this.$message({
           message: "标题不能为空！",
@@ -122,20 +120,11 @@ export default {
       this.publicVisible = true;
       this.getTags();
       this.getCatagorys();
-      // const data = {
-      //   title: this.title,
-      //   renderHtml: this.render,
-      //   tag: "",
-      //   catagory: "",
-      //   publicStatus: 0
-      // };
-      // AddArticle(data).then();
     },
     getTags() {
       GetTags().then(({ code, data }) => {
         if (code === "200") {
           this.tags = data;
-          console.log(this.tags);
         }
       });
     },
@@ -143,24 +132,26 @@ export default {
       GetCatagorys().then(({ code, data }) => {
         if (code === "200") {
           this.catagorys = data;
-          console.log(this.catagorys);
         }
       });
     },
-    addTag() {
-      AddTag();
-    },
     change(value, render) {
-      console.log("----value----");
-      console.log(value);
-      console.log("----render----");
-      console.log(render);
       this.render = render;
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           console.log(this.ruleForm);
+          const data = {
+            title: this.title,
+            renderHtml: this.render,
+            tag: this.ruleForm.tag.join(),
+            catagory: this.ruleForm.catagory.join(),
+            publicStatus: this.ruleForm.publicStatus
+          };
+          AddArticle(data).then(res => {
+            this.publicVisible = false;
+          });
         } else {
           console.log("error submit!!");
           return false;
@@ -173,12 +164,23 @@ export default {
     handleInputConfirm(type) {
       if (type === 0) {
         // 新增标签
-        this.addTagVisible = false;
         console.log(this.addTagName);
+        if (this.addTagName !== "") {
+          AddTag({ name: this.addTagName }).then(({ code }) => {
+            this.getTags();
+            this.addTagVisible = false;
+            this.addTagName = "";
+          });
+        }
       } else if (type === 1) {
         // 新增分类
-        this.addCatagoryVisible = false;
-        console.log(this.addCatagoryName);
+        if (this.addCatagoryName !== "") {
+          AddCatagory({ name: this.addCatagoryName }).then(({ code }) => {
+            this.getCatagorys();
+            this.addCatagoryVisible = false;
+            this.addCatagoryName = "";
+          });
+        }
       }
     },
     showInput() {

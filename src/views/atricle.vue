@@ -3,33 +3,36 @@
     <el-button type="primary" class="bottom10" @click="addAtricle">添加文章</el-button>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column type="index" label="序号" width="50"></el-table-column>
-      <el-table-column prop="title" label="文章标题"></el-table-column>
+      <el-table-column prop="title" label="文章标题" show-overflow-tooltip></el-table-column>
       <el-table-column label="文章标签" show-overflow-tooltip>
         <template slot-scope="scope">
           <el-tag
-            v-for="(item, index) in scope.row.tag"
+            v-for="(item, index) in scope.row.tagName"
             :key="index"
             :type="getType(index)"
           >{{item}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="文章分类">
+      <el-table-column label="文章分类" show-overflow-tooltip>
         <template slot-scope="scope">
-          <el-tag>{{scope.row.catagory}}</el-tag>
+          <el-tag
+            v-for="(item, index) in scope.row.catagoryName"
+            :key="index"
+            :type="getType(index)"
+          >{{item}}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="date" label="创建时间"></el-table-column>
-      <el-table-column prop="name" label="发布状态">
+      <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="name" label="发布形式">
         <template slot-scope="scope">
-          <span v-if="scope.row.status === '1'">已发布</span>
-          <span v-else>未发布</span>
+          <span>{{getPublicTxet(scope.row.publicStatus)}}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="160">
         <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row)" type="text">查看内容</el-button>
-          <el-button type="text">编辑</el-button>
-          <el-button type="text">删除</el-button>
+          <el-button @click="handleClick(scope.row, 0)" type="text">查看</el-button>
+          <el-button @click="handleClick(scope.row, 1)" type="text">编辑</el-button>
+          <el-button @click="handleClick(scope.row, 2)" type="text">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -37,32 +40,59 @@
 </template>
 
 <script>
+import { GetArticles, DelArticle, PutArticle } from "../api/index";
 export default {
   data() {
     return {
-      tableData: [
-        {
-          title: "标题1",
-          tag: ["js", "数组"],
-          catagory: "前端",
-          date: "2016-05-02",
-          status: "0"
-        }
-      ]
+      tableData: []
     };
   },
+  created() {
+    this.getArticles();
+  },
   methods: {
+    getArticles() {
+      GetArticles().then(({ code, data }) => {
+        if (code === "200") {
+          console.log(data);
+          this.tableData = data;
+        }
+      });
+    },
     getType(index) {
       const colorList = ["success", "info", "warning", "danger"];
       return colorList[index];
     },
-    handleClick(row) {
+    handleClick(row, type) {
       console.log(row);
+      if (type === 0) {
+        // 查看内容
+        console.log(row.renderHtml);
+      } else if (type === 1) {
+        // 编辑
+        PutArticle();
+      } else if (type === 2) {
+        // 删除
+        DelArticle({ id: row.id }).then(res => {
+          this.getArticles();
+        });
+      }
     },
     addAtricle() {
       this.$router.push({
         path: "/addAtricle"
       });
+    },
+    getPublicTxet(status) {
+      const publics = [
+        { status: "0", label: "公开" },
+        { status: "1", label: "私密" },
+        { status: "2", label: "保存为草稿" }
+      ];
+      const target = publics.filter(item => item.status === status);
+      if (target.length > 0) {
+        return target[0].label;
+      }
     }
   }
 };
