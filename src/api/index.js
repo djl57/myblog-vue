@@ -12,5 +12,6 @@ export const PutCatagory = data => axios.putData("putCatagory", data);
 
 export const AddArticle = data => axios.postData("addArticle", data);
 export const GetArticles = data => axios.getData("getArticles", data);
+export const GetArticleDetail = data => axios.getData("getArticleDetail", data);
 export const DelArticle = data => axios.deleteData("delArticle", data);
 export const PutArticle = data => axios.putData("putArticle", data);

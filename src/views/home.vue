@@ -14,7 +14,7 @@
       </el-header>
       <el-container>
         <el-aside width="200px">
-          <span>头像+介绍</span>
+          <!-- <span>头像+介绍</span> -->
         </el-aside>
         <el-main v-loading="articleLoading">
           <li class="article" v-for="item in articles" :key="item.id" @click="clickArticle(item)">
@@ -24,6 +24,12 @@
             </p>
             <p class="date">{{item.createTime}}</p>
           </li>
+          <article-detail
+            v-if="showArticleDetail"
+            class="detail"
+            :detail="articleDetailId"
+            @closeDetail="closeDetail"
+          ></article-detail>
         </el-main>
       </el-container>
     </el-container>
@@ -49,6 +55,7 @@
 </template>
 
 <script>
+import ArticleDetail from "./articleDetail";
 import { GetCatagorys, GetArticles } from "../api";
 export default {
   data() {
@@ -67,9 +74,12 @@ export default {
       catagory: [],
       curCatagoryId: 1,
       articleLoading: true,
-      articles: []
+      articles: [],
+      articleDetailId: null,
+      showArticleDetail: localStorage.getItem("curArticleDetailId")
     };
   },
+  components: { ArticleDetail },
   created() {
     this.getCatagory();
   },
@@ -85,7 +95,11 @@ export default {
     },
     getArticles() {
       this.articleLoading = true;
-      GetArticles({ catagory: this.curCatagoryId }).then(res => {
+      GetArticles({
+        catagory: this.curCatagoryId,
+        pageSize: 10,
+        pageNum: 1
+      }).then(res => {
         console.log(res);
         if (res.code === "200") {
           this.articles = res.data;
@@ -109,6 +123,7 @@ export default {
               localStorage.setItem("passSave", 1);
             }
             this.dialogVisible = false;
+            localStorage.removeItem("curArticleDetailId");
             this.$router.push({
               path: "/manageBlog"
             });
@@ -123,6 +138,7 @@ export default {
     },
     gotoManagePage() {
       if (localStorage.getItem("passSave")) {
+        localStorage.removeItem("curArticleDetailId");
         this.$router.push({
           path: "/manageBlog"
         });
@@ -141,7 +157,13 @@ export default {
       this.getArticles();
     },
     clickArticle(article) {
-      console.log(article);
+      localStorage.setItem("curArticleDetailId", article.id);
+      this.articleDetailId = article.id;
+      this.showArticleDetail = localStorage.getItem("curArticleDetailId");
+    },
+    closeDetail() {
+      localStorage.removeItem("curArticleDetailId");
+      this.showArticleDetail = localStorage.getItem("curArticleDetailId");
     }
   }
 };
@@ -149,12 +171,11 @@ export default {
 
 <style lang='scss' scoped>
 .el-header {
-  background-color: #303848;
-  color: #fff;
+  background-color: #fff;
   line-height: 58px;
+  border-bottom: 1px solid #dcdfe6;
 }
 .link {
-  color: #fff;
   padding: 0 20px;
   &:last-child {
     float: right;
@@ -176,6 +197,7 @@ export default {
   width: 100%;
   color: #303133;
   padding: 20px 40px;
+  position: relative;
 }
 .el-menu-item,
 .el-submenu__title {
@@ -215,9 +237,13 @@ export default {
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #dcdfe6;
-  &:first-child {
-    border-top: 1px solid #dcdfe6;
-  }
+}
+.detail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
 }
 </style>

@@ -71,6 +71,10 @@ export default {
       }
       if (command === "signOut") {
         localStorage.removeItem("passSave");
+        localStorage.removeItem("curArticleDetailId");
+      }
+      if (command === "gotoHome") {
+        localStorage.removeItem("curArticleDetailId");
       }
       this.$router.push({
         path: "/"
@@ -82,11 +86,10 @@ export default {
 
 <style lang='scss' scoped>
 .el-header {
-  background-color: #303848;
-  color: #fff;
+  background-color: #fff;
+  border-bottom: 1px solid #dcdfe6;
 }
 .link {
-  color: #fff;
   padding: 0 20px;
   float: right;
 }
@@ -99,6 +102,7 @@ export default {
   background-color: #fff;
   width: 100%;
   color: #303133;
+  position: relative;
 }
 .el-container {
   height: 100vh;

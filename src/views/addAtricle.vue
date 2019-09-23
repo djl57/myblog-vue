@@ -1,10 +1,10 @@
 <template>
   <div>
     <el-header>
-      <el-page-header @back="goBack" content="添加文章"></el-page-header>
+      <el-page-header @back="goBack" :content="pageContent"></el-page-header>
       <el-button class="button" type="primary" @click="publicArticle">发 布</el-button>
     </el-header>
-    <el-main>
+    <el-main v-loading="loading">
       <el-input v-model="title" placeholder="标题" class="input"></el-input>
       <mavon-editor v-model="value" @change="change" ref="mavonEditor" />
     </el-main>
@@ -15,7 +15,7 @@
             <el-checkbox
               v-for="item in tags"
               :key="item.id"
-              :label="item.id"
+              :label="''+item.id"
               name="tag"
             >{{item.name}}</el-checkbox>
             <el-input
@@ -35,7 +35,7 @@
             <el-checkbox
               v-for="item in catagorys"
               :key="item.id"
-              :label="item.id"
+              :label="''+item.id"
               name="catagory"
             >{{item.name}}</el-checkbox>
           </el-checkbox-group>
@@ -73,7 +73,8 @@ import {
   GetTags,
   GetCatagorys,
   AddTag,
-  AddCatagory
+  AddCatagory,
+  GetArticleDetail
 } from "../api/index";
 export default {
   data() {
@@ -102,10 +103,31 @@ export default {
         publicStatus: [
           { required: true, message: "请选择发布形式", trigger: "blur" }
         ]
-      }
+      },
+      pageContent: "添加文章",
+      loading: false,
+      content: {}
     };
   },
+  created() {
+    const id = localStorage.getItem("curArticleDetailId");
+    if (id) {
+      this.pageContent = "修改文章";
+      this.getArticleDetail(id);
+    }
+  },
   methods: {
+    getArticleDetail(id) {
+      this.loading = true;
+      GetArticleDetail({ id: id }).then(({ code, data }) => {
+        if (code === "200") {
+          this.loading = false;
+          this.value = data.mdValue;
+          this.title = data.title;
+          this.content = data;
+        }
+      });
+    },
     goBack() {
       this.$router.push({ path: "/manageBlog" });
     },
@@ -120,11 +142,15 @@ export default {
       this.publicVisible = true;
       this.getTags();
       this.getCatagorys();
+      this.ruleForm.publicStatus = this.content.publicStatus;
     },
     getTags() {
       GetTags().then(({ code, data }) => {
         if (code === "200") {
           this.tags = data;
+          console.log(this.tags);
+          this.ruleForm.tag = this.content.tag.split(",");
+          console.log(this.ruleForm.tag);
         }
       });
     },
@@ -132,6 +158,8 @@ export default {
       GetCatagorys().then(({ code, data }) => {
         if (code === "200") {
           this.catagorys = data;
+          this.ruleForm.catagory = this.content.catagory.split(",");
+          console.log(this.ruleForm.catagory);
         }
       });
     },
@@ -145,13 +173,21 @@ export default {
           const data = {
             title: this.title,
             renderHtml: this.render,
+            mdValue: this.value,
             tag: this.ruleForm.tag.join(),
             catagory: this.ruleForm.catagory.join(),
             publicStatus: this.ruleForm.publicStatus
           };
-          AddArticle(data).then(res => {
-            this.publicVisible = false;
-          });
+          const id = localStorage.getItem("curArticleDetailId");
+          if (id) {
+            PutArticle({ ...data, id: id }).then(res => {
+              this.publicVisible = false;
+            });
+          } else {
+            AddArticle(data).then(res => {
+              this.publicVisible = false;
+            });
+          }
         } else {
           console.log("error submit!!");
           return false;
