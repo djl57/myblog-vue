@@ -18,7 +18,7 @@
         </el-aside>
         <el-main v-loading="articleLoading">
           <li class="article" v-for="item in articles" :key="item.id" @click="clickArticle(item)">
-            <p class="title">{{item.title}}</p>
+            <p class="title">- {{item.title}}</p>
             <p class="tag">
               <el-tag v-for="(t, index) in item.tagName" :key="t" :type="getType(index)">{{t}}</el-tag>
             </p>
@@ -73,7 +73,7 @@ export default {
       checked: true,
       catagory: [],
       curCatagoryId: 1,
-      articleLoading: true,
+      articleLoading: false,
       articles: [],
       articleDetailId: null,
       showArticleDetail: localStorage.getItem("curArticleDetailId")
@@ -88,8 +88,10 @@ export default {
       GetCatagorys().then(({ code, data }) => {
         if (code === "200") {
           this.catagory = data;
-          this.curCatagoryId = data[0].id;
-          this.getArticles();
+          if (data.length > 0) {
+            this.curCatagoryId = data[0].id;
+            this.getArticles();
+          }
         }
       });
     },

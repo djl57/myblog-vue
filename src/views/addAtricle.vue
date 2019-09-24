@@ -148,9 +148,7 @@ export default {
       GetTags().then(({ code, data }) => {
         if (code === "200") {
           this.tags = data;
-          console.log(this.tags);
-          this.ruleForm.tag = this.content.tag.split(",");
-          console.log(this.ruleForm.tag);
+          this.content.tag && (this.ruleForm.tag = this.content.tag.split(","));
         }
       });
     },
@@ -158,8 +156,8 @@ export default {
       GetCatagorys().then(({ code, data }) => {
         if (code === "200") {
           this.catagorys = data;
-          this.ruleForm.catagory = this.content.catagory.split(",");
-          console.log(this.ruleForm.catagory);
+          this.content.catagory &&
+            (this.ruleForm.catagory = this.content.catagory.split(","));
         }
       });
     },
