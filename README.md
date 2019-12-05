@@ -1,27 +1,9 @@
-## Project setup
-```
-npm install
-```
+## 项目启动
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+npm install   // 安装依赖
+npm run serve // 启动项目
+npm run build // 项目打包
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## 后端项目
 
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+[项目 github 地址](https://github.com/djl57/koa-blog)
