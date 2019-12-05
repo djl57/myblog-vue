@@ -1,16 +1,23 @@
 <template>
   <div>
-    <el-button type="primary" class="bottom10" @click="addAtricle">添加文章</el-button>
-    <el-table :data="tableData" border style="width: 100%">
+    <el-button type="primary" class="bottom10" @click="addAtricle"
+      >添加文章</el-button
+    >
+    <el-table :data="tableData" border style="width: 100%" :height="height">
       <el-table-column type="index" label="序号" width="50"></el-table-column>
-      <el-table-column prop="title" label="文章标题" show-overflow-tooltip></el-table-column>
+      <el-table-column
+        prop="title"
+        label="文章标题"
+        show-overflow-tooltip
+      ></el-table-column>
       <el-table-column label="文章标签" show-overflow-tooltip>
         <template slot-scope="scope">
           <el-tag
             v-for="(item, index) in scope.row.tagName"
             :key="index"
             :type="getType(index)"
-          >{{item}}</el-tag>
+            >{{ item }}</el-tag
+          >
         </template>
       </el-table-column>
       <el-table-column label="文章分类" show-overflow-tooltip>
@@ -19,19 +26,28 @@
             v-for="(item, index) in scope.row.catagoryName"
             :key="index"
             :type="getType(index)"
-          >{{item}}</el-tag>
+            >{{ item }}</el-tag
+          >
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="创建时间" show-overflow-tooltip></el-table-column>
+      <el-table-column
+        prop="createTime"
+        label="创建时间"
+        show-overflow-tooltip
+      ></el-table-column>
       <el-table-column prop="name" label="发布形式">
         <template slot-scope="scope">
-          <span>{{getPublicTxet(scope.row.publicStatus)}}</span>
+          <span>{{ getPublicTxet(scope.row.publicStatus) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="160">
         <template slot-scope="scope">
-          <el-button @click="handleClick(scope.row, 0)" type="text">查看文章</el-button>
-          <el-button @click="handleClick(scope.row, 2)" type="text">删除</el-button>
+          <el-button @click="handleClick(scope.row, 0)" type="text"
+            >查看文章</el-button
+          >
+          <el-button @click="handleClick(scope.row, 2)" type="text"
+            >删除</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -58,10 +74,15 @@ export default {
   created() {
     this.getArticles();
   },
+  computed: {
+    height() {
+      return document.body.clientHeight - 180;
+    }
+  },
   components: { ArticleDetail },
   methods: {
     getArticles() {
-      GetArticles({ pageNum: 1, pageSize: 10 }).then(({ code, data }) => {
+      GetArticles({ pageNum: 1, pageSize: 9999 }).then(({ code, data }) => {
         if (code === "200") {
           console.log(data);
           this.tableData = data;
@@ -77,7 +98,7 @@ export default {
       if (type === 0) {
         // 查看内容
         localStorage.setItem("curArticleDetailId", row.id);
-        this.articleDetailId = row.id
+        this.articleDetailId = row.id;
         this.showArticleDetail = true;
       } else if (type === 1) {
         // 编辑
@@ -113,7 +134,7 @@ export default {
 };
 </script>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .bottom10 {
   margin-bottom: 10px;
 }

@@ -99,7 +99,7 @@ export default {
       this.articleLoading = true;
       GetArticles({
         catagory: this.curCatagoryId,
-        pageSize: 10,
+        pageSize: 9999,
         pageNum: 1
       }).then(res => {
         console.log(res);
